@@ -1,4 +1,6 @@
 
+# 不想自己编译的话，可以直接查看第9步，有完成编译的framework和使用方法
+
 ## 0. 编译环境
 
 - Mac OS X 10.15.4
@@ -136,10 +138,11 @@ https://github.com/MrQiuHaHa/JRIJKMediaFramework.git
 > 这里有我对framework的使用方式的demo，并且有对UI控制层的封装
 https://github.com/MrQiuHaHa/YMPlayer.git
 
-```
+> 特别强调一下，前面自己加入的manager、fftools功能是为了利用ijkplayer内部集成的ffmpeg对视频进行转码下载操作，因为你的需求可能不仅仅只是播放视频，也可能想下载下来保存到iOS相册，而iOS相册只能保存h264编码视频。
 
-# 特别强调一下，前面自己加入的manager、fftools功能是为了利用ijkplayer内部集成的ffmpeg对视频进行转码下载操作，因为你的需求可能不仅仅只是播放视频，也可能想下载下来保存到iOS相册，而iOS相册只能保存h264编码视频。
-# 也可能你的项目本来就使用了FFmpeg，但是ijkplayer也使用了，所以你引入ijkplayer的时候，你的工程其实就有了两份FFmpeg的静态库，必然导致报错。处理方式就是把ijkplayer集成的FFmpeg也编译出外部可用，并且把调用api对外开放，JRFFmpegManager就是这个让外部调用ijk集成的FFmpeg
+> 可能你的项目本来就使用了FFmpeg，但是ijkplayer也使用了，所以你引入ijkplayer的时候，你的工程其实就有了两份FFmpeg的静态库，必然导致报错。处理方式就是把ijkplayer集成的FFmpeg也编译出外部可用，并且把调用api对外开放，JRFFmpegManager就是这个让外部调用ijk集成的FFmpeg
+
+```
 
 # 这里的inputPath可以只是本地路径也可以是一个网络url
     [[JRFFmpegManager shared] converWithInputPath:inputUrlPath outputPath:outputPath processBlock:^(float process) {

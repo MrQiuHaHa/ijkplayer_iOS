@@ -98,8 +98,9 @@ sh compile-ffmpeg.sh clean
 ```
 # 打开工程，在ios目录下可以看到工程IJKMediaDemo
 open IJKMediaDemo/IJKMediaDemo.xcodeproj
-# 找到目录IJKMediaDemo->IJKMediaPlayer.xcodeproj->Classes->IJKFFMoviePlayerController->ffmpeg->lib，鼠标右击delete -> Remove References
-# 把ios/build/universal下的四个文件夹拖到上面的ffmpeg目录下，完成依赖。
+# 找到目录IJKMediaDemo->IJKMediaPlayer.xcodeproj->Classes->IJKFFMoviePlayerController->ffmpeg->lib，
+  鼠标右击delete -> Remove References删除依赖（千万别Move to Trash啊）
+# 把ios/build/universal下的四个文件夹拖到上面的ffmpeg目录下，重新完成依赖。
 # 至此：全部完成，已经可以直接真机调试demo
 ```
 

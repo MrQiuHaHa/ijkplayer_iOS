@@ -61,7 +61,7 @@ sh compile-ffmpeg.sh clean
 
 > 下面两个步骤耗时久，在ios/build目录下编译出各个架构平台的.a文件，最后合并多架构文件到ios/build/universal/lib下
 
-- 对已下载的openssl进行编译
+##### 6.1 对已下载的openssl进行编译
 
 ```
 ./compile-openssl.sh all
@@ -69,20 +69,21 @@ sh compile-ffmpeg.sh clean
 
 > 编译完openssl后会生成支持 https 的静态文件 libcrypto.a 和 libssl.a 在目录ios/build/universal/lib
 
-- 对已下载的ffmpeg进行编译
+##### 6.2 对已下载的ffmpeg进行编译
 
 ```
 ./compile-ffmpeg.sh all
 ```
 
-> 编译完后生成的.a文件在目录ios/build/universal/lib下，以及目录ios/build/universal/include下的头文件
+> 编译完ffmpeg后生成的.a文件在目录ios/build/universal/lib下，以及目录ios/build/universal/include下的头文件
+
+##### 6.3 把自己准备的文件拖到对应的位置（查看第9点说明作用）
 
 ```
-但是其自动生成的头文件不全，会缺少一些后续我们需要使用的头文件，所以直接把我上传在ios目录下的include文件夹整个拖过去替换掉即可。
+6.2步骤编译生成的include下的头文件，会缺少一些后续我们需要使用的头文件，所以直接把我上传在ios目录下的include文件夹整个拖过去替换掉即可
+仅仅是增加了一些我们需要使用头文件，假如后续需要更多头文件直接去源码拷贝过来即可
 ```
 
-
-- 把自己准备的文件拖到对应的位置（查看第9点说明）
 ```
 把ios目录下的manager、fftools文件夹拖到ios/build/universal目录下
 把ios目录下的libx264.a文件拖到ios/build/universal/lib目录下

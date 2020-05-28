@@ -1,280 +1,114 @@
-# ijkplayer
 
- Platform | Build Status
- -------- | ------------
- Android | [![Build Status](https://travis-ci.org/Bilibili/ci-ijk-ffmpeg-android.svg?branch=master)](https://travis-ci.org/Bilibili/ci-ijk-ffmpeg-android)
- iOS | [![Build Status](https://travis-ci.org/Bilibili/ci-ijk-ffmpeg-ios.svg?branch=master)](https://travis-ci.org/Bilibili/ci-ijk-ffmpeg-ios)
+## 0. 编译环境
 
-Video player based on [ffplay](http://ffmpeg.org)
+- Mac OS X 10.15.4
+- Xcode 11.4.1
 
-### Download
+## 1. 安装 homebrew, git, yasm工具，在终端输入
 
-- Android:
- - Gradle
 ```
-# required
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
-
-dependencies {
-    # required, enough for most devices.
-    compile 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
-    compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
-
-    # Other ABIs: optional
-    compile 'tv.danmaku.ijk.media:ijkplayer-armv5:0.8.8'
-    compile 'tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8'
-    compile 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
-    compile 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.8'
-
-    # ExoPlayer as IMediaPlayer: optional, experimental
-    compile 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
-}
-```
-- iOS
- - in coming...
-
-### My Build Environment
-- Common
- - Mac OS X 10.11.5
-- Android
- - [NDK r10e](http://developer.android.com/tools/sdk/ndk/index.html)
- - Android Studio 2.1.3
- - Gradle 2.14.1
-- iOS
- - Xcode 7.3 (7D175)
-- [HomeBrew](http://brew.sh)
- - ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
- - brew install git
-
-### Latest Changes
-- [NEWS.md](NEWS.md)
-
-### Features
-- Common
- - remove rarely used ffmpeg components to reduce binary size [config/module-lite.sh](config/module-lite.sh)
- - workaround for some buggy online video.
-- Android
- - platform: API 9~23
- - cpu: ARMv7a, ARM64v8a, x86 (ARMv5 is not tested on real devices)
- - api: [MediaPlayer-like](android/ijkplayer/ijkplayer-java/src/main/java/tv/danmaku/ijk/media/player/IMediaPlayer.java)
- - video-output: NativeWindow, OpenGL ES 2.0
- - audio-output: AudioTrack, OpenSL ES
- - hw-decoder: MediaCodec (API 16+, Android 4.1+)
- - alternative-backend: android.media.MediaPlayer, ExoPlayer
-- iOS
- - platform: iOS 7.0~10.2.x
- - cpu: armv7, arm64, i386, x86_64, (armv7s is obselete)
- - api: [MediaPlayer.framework-like](ios/IJKMediaPlayer/IJKMediaPlayer/IJKMediaPlayback.h)
- - video-output: OpenGL ES 2.0
- - audio-output: AudioQueue, AudioUnit
- - hw-decoder: VideoToolbox (iOS 8+)
- - alternative-backend: AVFoundation.Framework.AVPlayer, MediaPlayer.Framework.MPMoviePlayerControlelr (obselete since iOS 8)
-
-### NOT-ON-PLAN
-- obsolete platforms (Android: API-8 and below; iOS: pre-6.0)
-- obsolete cpu: ARMv5, ARMv6, MIPS (I don't even have these types of devices…)
-- native subtitle render
-- avfilter support
-
-### Before Build
-```
-# install homebrew, git, yasm
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew install git
 brew install yasm
-
-# add these lines to your ~/.bash_profile or ~/.profile
-# export ANDROID_SDK=<your sdk path>
-# export ANDROID_NDK=<your ndk path>
-
-# on Cygwin (unmaintained)
-# install git, make, yasm
 ```
 
-- If you prefer more codec/format
-```
-cd config
-rm module.sh
-ln -s module-default.sh module.sh
-cd android/contrib
-# cd ios
-sh compile-ffmpeg.sh clean
-```
+## 2. 下载当前已经修改过的ijkplayer源码
 
-- If you prefer less codec/format for smaller binary size (include hevc function)
+`git clone https://github.com/MrQiuHaHa/ijkplayer_iOS.git`
+> 源码的修改过程在git上有记录，当前工程是官方k0.8.8版本，修改后升级了FFmpeg4.0版本，以及openssl版本，和修复卡线程bug，对x264的支持，新增了默认支持的编码格式
+
+## 3. 配置编解码器格式 
+
 ```
 cd config
+# 删除当前的 module.sh 文件
 rm module.sh
+# 创建软链接 module.sh 指向 module-lite-hevc.sh
 ln -s module-lite-hevc.sh module.sh
-cd android/contrib
-# cd ios
-sh compile-ffmpeg.sh clean
-```
-
-- If you prefer less codec/format for smaller binary size (by default)
-```
-cd config
-rm module.sh
-ln -s module-lite.sh module.sh
-cd android/contrib
-# cd ios
-sh compile-ffmpeg.sh clean
-```
-
-- For Ubuntu/Debian users.
-```
-# choose [No] to use bash
-sudo dpkg-reconfigure dash
-```
-
-- If you'd like to share your config, pull request is welcome.
-
-### Build Android
-```
-git clone https://github.com/Bilibili/ijkplayer.git ijkplayer-android
-cd ijkplayer-android
-git checkout -B latest k0.8.8
-
-./init-android.sh
-
-cd android/contrib
-./compile-ffmpeg.sh clean
-./compile-ffmpeg.sh all
 
 cd ..
-./compile-ijk.sh all
-
-# Android Studio:
-#     Open an existing Android Studio project
-#     Select android/ijkplayer/ and import
-#
-#     define ext block in your root build.gradle
-#     ext {
-#       compileSdkVersion = 23       // depending on your sdk version
-#       buildToolsVersion = "23.0.0" // depending on your build tools version
-#
-#       targetSdkVersion = 23        // depending on your sdk version
-#     }
-#
-# If you want to enable debugging ijkplayer(native modules) on Android Studio 2.2+: (experimental)
-#     sh android/patch-debugging-with-lldb.sh armv7a
-#     Install Android Studio 2.2(+)
-#     Preference -> Android SDK -> SDK Tools
-#     Select (LLDB, NDK, Android SDK Build-tools,Cmake) and install
-#     Open an existing Android Studio project
-#     Select android/ijkplayer
-#     Sync Project with Gradle Files
-#     Run -> Edit Configurations -> Debugger -> Symbol Directories
-#     Add "ijkplayer-armv7a/.externalNativeBuild/ndkBuild/release/obj/local/armeabi-v7a" to Symbol Directories
-#     Run -> Debug 'ijkplayer-example'
-#     if you want to reverse patches:
-#     sh patch-debugging-with-lldb.sh reverse armv7a
-#
-# Eclipse: (obselete)
-#     File -> New -> Project -> Android Project from Existing Code
-#     Select android/ and import all project
-#     Import appcompat-v7
-#     Import preference-v7
-#
-# Gradle
-#     cd ijkplayer
-#     gradle
-
-```
-
-
-### Build iOS
-```
-git clone https://github.com/Bilibili/ijkplayer.git ijkplayer-ios
-cd ijkplayer-ios
-git checkout -B latest k0.8.8
-
-./init-ios.sh
-
 cd ios
-./compile-ffmpeg.sh clean
+# 清空历史编译记录（防止之前编译过导致冲突）
+sh compile-ffmpeg.sh clean
+```
+
+## 4. 下载 FFmpeg 并初始化
+
+```
+cd ..
+# 脚本已经被修改为拉取FFmpeg4.0版本，此过程耗时久（建议后续步骤开启代理，你懂得）
+./init-ios.sh
+```
+> 执行完后，可以在extra目录下，看到ffmpeg文件夹的源码
+
+## 5. 下载 openssl 并初始化（增加HTTPS支持）
+
+```
+# 脚本已修改升级制定拉取版本为OpenSSL_1_0_2u版本，耗时过程，建议开启代理
+./init-ios-openssl.sh
+```
+> 执行完后，可以在extra目录下，看到openssl文件夹的源码
+
+## 6. 编译（最关键且容易出错的步骤）
+> 如果下一步提示错误`xcrun: error: SDK "iphoneos" cannot be located`, 请执行`sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer/`, 再重新执行下一步
+
+```
+cd ios
+# 编译前还是多再清空一下
+sh compile-ffmpeg.sh clean
+```
+
+
+> 下面两个步骤耗时久，会先在ios目录下编译出各个平台架构的源码，然后在ios/build目录下编译出各个平台的.a文件，最后合并多架构文件到ios/build/universal/lib下
+
+- 对已下载的openssl进行编译
+
+```
+./compile-openssl.sh all
+```
+
+> 编译完openssl后会生成支持 https 的静态文件 libcrypto.a 和 libssl.a 在目录ios/build/universal/lib
+
+- 对已下载的ffmpeg进行编译
+
+```
 ./compile-ffmpeg.sh all
+```
 
-# Demo
-#     open ios/IJKMediaDemo/IJKMediaDemo.xcodeproj with Xcode
-# 
-# Import into Your own Application
-#     Select your project in Xcode.
-#     File -> Add Files to ... -> Select ios/IJKMediaPlayer/IJKMediaPlayer.xcodeproj
-#     Select your Application's target.
-#     Build Phases -> Target Dependencies -> Select IJKMediaFramework
-#     Build Phases -> Link Binary with Libraries -> Add:
-#         IJKMediaFramework.framework
-#
-#         AudioToolbox.framework
-#         AVFoundation.framework
-#         CoreGraphics.framework
-#         CoreMedia.framework
-#         CoreVideo.framework
-#         libbz2.tbd
-#         libz.tbd
-#         MediaPlayer.framework
-#         MobileCoreServices.framework
-#         OpenGLES.framework
-#         QuartzCore.framework
-#         UIKit.framework
-#         VideoToolbox.framework
-#
-#         ... (Maybe something else, if you get any link error)
-# 
+> 编译完后生成的.a文件在目录ios/build/universal/lib下，以及目录ios/build/universal/include下的头文件
+
+```
+但是其自动生成的头文件不全，会缺少一些后续我们需要使用的头文件，所以直接把我上传在ios目录下的include文件夹整个拖过去替换掉即可。
 ```
 
 
-### Support (支持) ###
-- Please do not send e-mail to me. Public technical discussion on github is preferred.
-- 请尽量在 github 上公开讨论[技术问题](https://github.com/bilibili/ijkplayer/issues)，不要以邮件方式私下询问，恕不一一回复。
-
-
-### License
-
+- 最后，把自己的OC调用C的文件和写好的C++对ffmpeg的api调用的功能文件拖到对应的位置
 ```
-Copyright (c) 2017 Bilibili
-Licensed under LGPLv2.1 or later
+把ios目录下的manager、fftools文件夹拖到ios/build/universal目录下
+把ios目录下的libx264.a文件拖到ios/build/universal/lib目录下
+（至此：ios/build/universal这个目录下已经有我们所有要准备的东西）
 ```
 
-ijkplayer required features are based on or derives from projects below:
-- LGPL
-  - [FFmpeg](http://git.videolan.org/?p=ffmpeg.git)
-  - [libVLC](http://git.videolan.org/?p=vlc.git)
-  - [kxmovie](https://github.com/kolyvan/kxmovie)
-  - [soundtouch](http://www.surina.net/soundtouch/sourcecode.html)
-- zlib license
-  - [SDL](http://www.libsdl.org)
-- BSD-style license
-  - [libyuv](https://code.google.com/p/libyuv/)
-- ISC license
-  - [libyuv/source/x86inc.asm](https://code.google.com/p/libyuv/source/browse/trunk/source/x86inc.asm)
+## 7. 打开 IJKMediaDemo 项目
 
-android/ijkplayer-exo is based on or derives from projects below:
-- Apache License 2.0
-  - [ExoPlayer](https://github.com/google/ExoPlayer)
+- 把上面步骤准备好的ios/build/universal目录下的相关文件依赖到IJKMediaDemo工程下
+```
+# 打开工程，在ios目录下可以看到工程IJKMediaDemo
+open IJKMediaDemo/IJKMediaDemo.xcodeproj
+# 找到目录IJKMediaDemo->IJKMediaPlayer.xcodeproj->Classes->IJKFFMoviePlayerController->ffmpeg->lib，鼠标右击delete -> Remove References
+# 把ios/build/universal下的四个文件夹拖到上面的ffmpeg目录下，完成依赖。
+# 至此：全部完成，已经可以直接真机调试demo
+```
 
-android/example is based on or derives from projects below:
-- GPL
-  - [android-ndk-profiler](https://github.com/richq/android-ndk-profiler) (not included by default)
+## 8. 打包 framwork 注意点
+> 大家会发现除了 IJKMediaFramework这个target, 还有一个叫 IJKMediaFrameworkWithSSL, 但是不推荐使用这个, 因为大部分基于 ijkplayer 的第三方框架都是使用的前者, 你把后者导入项目还是会报找不到包的错误, 就算你要支持 https 也推荐使用前者, 然后按照上一步添加 openssl即可支持
 
-ios/IJKMediaDemo is based on or derives from projects below:
-- Unknown license
-  - [iOS7-BarcodeScanner](https://github.com/jpwiddy/iOS7-BarcodeScanner)
+```
+打包的时候把工程的debug改成release（常识别忘记啦）
+模拟器和真机的架构都需要，这样把framework推导pod私有源才可以通过校验
+```
 
-ijkplayer's build scripts are based on or derives from projects below:
-- [gas-preprocessor](http://git.libav.org/?p=gas-preprocessor.git)
-- [VideoLAN](http://git.videolan.org)
-- [yixia/FFmpeg-Android](https://github.com/yixia/FFmpeg-Android)
-- [kewlbear/FFmpeg-iOS-build-script](https://github.com/kewlbear/FFmpeg-iOS-build-script) 
+## 9. 最后
 
-### Commercial Use
-ijkplayer is licensed under LGPLv2.1 or later, so itself is free for commercial use under LGPLv2.1 or later
-
-But ijkplayer is also based on other different projects under various licenses, which I have no idea whether they are compatible to each other or to your product.
-
-[IANAL](https://en.wikipedia.org/wiki/IANAL), you should always ask your lawyer for these stuffs before use it in your product.
+> 这里有我已经编译完成的framework，也支持私有源直接导入
+https://github.com/MrQiuHaHa/JRIJKMediaFramework.git

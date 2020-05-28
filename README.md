@@ -39,7 +39,7 @@ cd ..
 # 脚本已经被修改为拉取FFmpeg4.0版本，此过程耗时久（建议后续步骤开启代理，你懂得）
 ./init-ios.sh
 ```
-> 执行完后，可以在extra目录下，看到ffmpeg文件夹的源码
+> 执行完后，可以在extra目录下看到ffmpeg文件夹的源码以及 **按照我们配置的参数** 在ios目录下拉取各个平台架构的ffmpeg源码
 
 ## 5. 下载 openssl 并初始化（增加HTTPS支持）
 
@@ -47,7 +47,7 @@ cd ..
 # 脚本已修改升级制定拉取版本为OpenSSL_1_0_2u版本，耗时过程，建议开启代理
 ./init-ios-openssl.sh
 ```
-> 执行完后，可以在extra目录下，看到openssl文件夹的源码
+> 执行完后，可以在extra目录下，看到openssl文件夹的源码以及 **按照我们配置的参数** 在ios目录下拉取各个平台架构的openssl源码
 
 ## 6. 编译（最关键且容易出错的步骤）
 > 如果下一步提示错误`xcrun: error: SDK "iphoneos" cannot be located`, 请执行`sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer/`, 再重新执行下一步
@@ -59,7 +59,7 @@ sh compile-ffmpeg.sh clean
 ```
 
 
-> 下面两个步骤耗时久，会先在ios目录下编译出各个平台架构的源码，然后在ios/build目录下编译出各个平台的.a文件，最后合并多架构文件到ios/build/universal/lib下
+> 下面两个步骤耗时久，在ios/build目录下编译出各个架构平台的.a文件，最后合并多架构文件到ios/build/universal/lib下
 
 - 对已下载的openssl进行编译
 

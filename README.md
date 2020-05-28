@@ -92,16 +92,32 @@ sh compile-ffmpeg.sh clean
 （至此：ios/build/universal这个目录下已经有我们所有要准备的东西）
 ```
 
-## 7. 打开 IJKMediaDemo 项目
+## 7. 打开 IJKMediaDemo 项目，完成最后配置
 
 - 把上面步骤准备好的ios/build/universal目录下的相关文件依赖到IJKMediaDemo工程下
 ```
 # 打开工程，在ios目录下可以看到工程IJKMediaDemo
-open IJKMediaDemo/IJKMediaDemo.xcodeproj
+  open IJKMediaDemo/IJKMediaDemo.xcodeproj
+```
+
+```
 # 找到目录IJKMediaDemo->IJKMediaPlayer.xcodeproj->Classes->IJKFFMoviePlayerController->ffmpeg->lib，
   鼠标右击delete -> Remove References删除依赖（千万别Move to Trash啊）
-# 把ios/build/universal下的四个文件夹拖到上面的ffmpeg目录下，重新完成依赖。
-# 至此：全部完成，已经可以直接真机调试demo
+# 再把ios/build/universal下的四个文件夹拖到上面的ffmpeg目录下，重新完成依赖。
+```
+
+```
+# 找到IJKMediaDemo->IJKMediaPlayer.xcodeproj->IJKMediaFramework.h
+  增加一行代码把JRFFmpegManager公开给生成framework后外部可以引用
+  #import <IJKMediaFramework/JRFFmpegManager.h>
+  同时：选中IJKMediaPlayer.xcodeproj工程，点击Build Phases选项，
+  在Headers配置的Project选项里找到JRFFmpegManager.h文件拖到Public目录里，
+  这样才完成JRFFmpegManager.h文件对外部的公开
+```
+
+```
+# 至此：全部完成，选中找到IJKMediaDemo项目，进行真机调试demo。
+# 可以正常运行再进行下一步生成framework
 ```
 
 ## 8. 打包 framwork 注意点
@@ -123,6 +139,8 @@ https://github.com/MrQiuHaHa/YMPlayer.git
 ```
 
 # 特别强调一下，前面自己加入的manager、fftools功能是为了利用ijkplayer内部集成的ffmpeg对视频进行转码下载操作，因为你的需求可能不仅仅只是播放视频，也可能想下载下来保存到iOS相册，而iOS相册只能保存h264编码视频。
+# 也可能你的项目本来就使用了FFmpeg，但是ijkplayer也使用了，所以你引入ijkplayer的时候，你的工程其实就有了两份FFmpeg的静态库，必然导致报错。处理方式就是把ijkplayer集成的FFmpeg也编译出外部可用，并且把调用api对外开放，JRFFmpegManager就是这个让外部调用ijk集成的FFmpeg
+
 # 这里的inputPath可以只是本地路径也可以是一个网络url
     [[JRFFmpegManager shared] converWithInputPath:inputUrlPath outputPath:outputPath processBlock:^(float process) {
         NSLog(@"转码进度---- %f",process);

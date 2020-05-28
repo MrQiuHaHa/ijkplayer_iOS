@@ -39,7 +39,7 @@ cd ..
 # 脚本已经被修改为拉取FFmpeg4.0版本，此过程耗时久（建议后续步骤开启代理，你懂得）
 ./init-ios.sh
 ```
-> 执行完后，可以在extra目录下看到ffmpeg文件夹的源码以及 **按照我们配置的参数** 在ios目录下拉取各个平台架构的ffmpeg源码
+> 执行完后，可以在extra目录下看到ffmpeg文件夹的源码以及 **按照config目录下参数** 在ios目录下拉取各个平台架构的ffmpeg源码
 
 ## 5. 下载 openssl 并初始化（增加HTTPS支持）
 
@@ -47,7 +47,7 @@ cd ..
 # 脚本已修改升级制定拉取版本为OpenSSL_1_0_2u版本，耗时过程，建议开启代理
 ./init-ios-openssl.sh
 ```
-> 执行完后，可以在extra目录下，看到openssl文件夹的源码以及 **按照我们配置的参数** 在ios目录下拉取各个平台架构的openssl源码
+> 执行完后，可以在extra目录下，看到openssl文件夹的源码以及 **按照config目录下参数** 在ios目录下拉取各个平台架构的openssl源码
 
 ## 6. 编译（最关键且容易出错的步骤）
 > 如果下一步提示错误`xcrun: error: SDK "iphoneos" cannot be located`, 请执行`sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer/`, 再重新执行下一步
@@ -61,7 +61,7 @@ sh compile-ffmpeg.sh clean
 
 > 下面两个步骤耗时久，在ios/build目录下编译出各个架构平台的.a文件，最后合并多架构文件到ios/build/universal/lib下
 
-##### 6.1 对已下载的openssl进行编译
+#### 6.1 对已下载的openssl进行编译
 
 ```
 ./compile-openssl.sh all
@@ -69,7 +69,7 @@ sh compile-ffmpeg.sh clean
 
 > 编译完openssl后会生成支持 https 的静态文件 libcrypto.a 和 libssl.a 在目录ios/build/universal/lib
 
-##### 6.2 对已下载的ffmpeg进行编译
+#### 6.2 对已下载的ffmpeg进行编译
 
 ```
 ./compile-ffmpeg.sh all
@@ -77,7 +77,7 @@ sh compile-ffmpeg.sh clean
 
 > 编译完ffmpeg后生成的.a文件在目录ios/build/universal/lib下，以及目录ios/build/universal/include下的头文件
 
-##### 6.3 把自己准备的文件拖到对应的位置（查看第9点说明作用）
+#### 6.3 把自己准备的文件拖到对应的位置（查看第9点说明作用）
 
 ```
 6.2步骤编译生成的include下的头文件，会缺少一些后续我们需要使用的头文件，所以直接把我上传在ios目录下的include文件夹整个拖过去替换掉即可

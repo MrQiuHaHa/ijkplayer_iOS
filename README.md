@@ -82,7 +82,7 @@ sh compile-ffmpeg.sh clean
 ```
 
 
-- 最后，把自己的OC调用C的文件和写好的C++对ffmpeg的api调用的功能文件拖到对应的位置
+- 把自己准备的文件拖到对应的位置（查看第9点说明）
 ```
 把ios目录下的manager、fftools文件夹拖到ios/build/universal目录下
 把ios目录下的libx264.a文件拖到ios/build/universal/lib目录下
@@ -112,3 +112,53 @@ open IJKMediaDemo/IJKMediaDemo.xcodeproj
 
 > 这里有我已经编译完成的framework，也支持私有源直接导入
 https://github.com/MrQiuHaHa/JRIJKMediaFramework.git
+
+> 这里有我对framework的使用方式的demo，并且有对UI控制层的封装
+https://github.com/MrQiuHaHa/YMPlayer.git
+
+```
+
+# 特别强调一下，前面自己加入的manager、fftools功能是为了利用ijkplayer内部集成的ffmpeg对视频进行转码下载操作，因为你的需求可能不仅仅只是播放视频，也可能想下载下来保存到iOS相册，而iOS相册只能保存h264编码视频。
+# 这里的inputPath可以只是本地路径也可以是一个网络url
+    [[JRFFmpegManager shared] converWithInputPath:inputUrlPath outputPath:outputPath processBlock:^(float process) {
+        NSLog(@"转码进度---- %f",process);
+        if (weakSelf.downLoadProgressCallBack) {
+            weakSelf.downLoadProgressCallBack(process);
+        }
+    } completionBlock:^(NSError * _Nonnull error) {
+        
+        if (firstErr == 1) {
+            firstErr = 2;//使用在线转码功能，ffmpeg会直接先回调个错误，具体原因暂未排查
+        } else {
+            if (error) {
+                NSLog(@"转码错误 %@",error);
+                if (weakSelf.downLoadWithErrorCallBack) {
+                    weakSelf.downLoadWithErrorCallBack(@"下载失败，请重试");
+                }
+            } else {
+                if (weakSelf.didFinishDownLoadCallBack) {
+                    weakSelf.didFinishDownLoadCallBack(outputPath);
+                }
+            }
+            
+            weakSelf.gestureControl.forbidGesture = NO;
+        }
+    }];
+```
+
+```
+# 引入YMPlayer的播放器的私有库后，你的项目可以直接push到播放器控制器。UI控制层的修改可以在VideoControlView目录对应的view直接修改
+- (IBAction)jumpToPlayerPage:(id)sender {
+    
+    NSArray *videoArr = @[
+       [NSURL URLWithString:@"https://www.apple.com/105/media/cn/mac/family/2018/46c4b917_abfd_45a3_9b51_4e3054191797/films/bruce/mac-bruce-tpl-cn-2018_1280x720h.mp4"],
+       [NSURL URLWithString:@"https://www.apple.com/105/media/us/mac/family/2018/46c4b917_abfd_45a3_9b51_4e3054191797/films/peter/mac-peter-tpl-cc-us-2018_1280x720h.mp4"],
+       [NSURL URLWithString:@"https://www.apple.com/105/media/us/mac/family/2018/46c4b917_abfd_45a3_9b51_4e3054191797/films/grimes/mac-grimes-tpl-cc-us-2018_1280x720h.mp4"],
+       [NSURL URLWithString:@"http://yamei-adr-oss.iauto360.cn/SOS_N_000000002_20190924_497cf6b6-df6a-44b8-9468-56d4d1b92fa8.mp4"]];
+       NSArray *titleArr = @[@"iphone11介绍视频",@"我是第二个视频",@"我是第三个最后的视频",@"车智汇视频"];
+    YMWisdomVideoPlayerVC *vc = [[YMWisdomVideoPlayerVC alloc] init];
+    vc.assetURLs = videoArr;
+    vc.assetTitles = titleArr;
+    [self.navigationController pushViewController:vc animated:NO];
+}
+```

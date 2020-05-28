@@ -36,7 +36,7 @@ sh compile-ffmpeg.sh clean
 
 ```
 cd ..
-# 脚本已经被修改为拉取FFmpeg4.0版本，此过程耗时久（建议后续步骤开启代理，你懂得）
+# 脚本已经被修改为指定拉取FFmpeg4.0版本，此过程耗时久（建议后续步骤开启代理，你懂得）
 ./init-ios.sh
 ```
 > 执行完后，可以在extra目录下看到ffmpeg文件夹的源码以及 **按照config目录下参数** 在ios目录下拉取各个平台架构的ffmpeg源码
@@ -44,7 +44,7 @@ cd ..
 ## 5. 下载 openssl 并初始化（增加HTTPS支持）
 
 ```
-# 脚本已修改升级制定拉取版本为OpenSSL_1_0_2u版本，耗时过程，建议开启代理
+# 脚本已修改为指定拉取版本为OpenSSL_1_0_2u版本，耗时过程，建议开启代理
 ./init-ios-openssl.sh
 ```
 > 执行完后，可以在extra目录下，看到openssl文件夹的源码以及 **按照config目录下参数** 在ios目录下拉取各个平台架构的openssl源码
@@ -72,6 +72,7 @@ sh compile-ffmpeg.sh clean
 #### 6.2 对已下载的ffmpeg进行编译
 
 ```
+开始会卡很久，需要耐心等待
 ./compile-ffmpeg.sh all
 ```
 
@@ -80,7 +81,8 @@ sh compile-ffmpeg.sh clean
 #### 6.3 把自己准备的文件拖到对应的位置（查看第9点说明作用）
 
 ```
-6.2步骤编译生成的include下的头文件，会缺少一些后续我们需要使用的头文件，所以直接把我上传在ios目录下的include文件夹整个拖过去替换掉即可
+6.2步骤编译生成的include下的头文件，会缺少一些后续我们需要使用的头文件，
+所以直接把我上传在ios目录下的include文件夹整个拖过去替换掉即可
 仅仅是增加了一些我们需要使用头文件，假如后续需要更多头文件直接去源码拷贝过来即可
 ```
 
@@ -96,8 +98,9 @@ sh compile-ffmpeg.sh clean
 ```
 # 打开工程，在ios目录下可以看到工程IJKMediaDemo
 open IJKMediaDemo/IJKMediaDemo.xcodeproj
-# 找到目录IJKMediaDemo->IJKMediaPlayer.xcodeproj->Classes->IJKFFMoviePlayerController->ffmpeg->lib，鼠标右击delete -> Remove References
-# 把ios/build/universal下的四个文件夹拖到上面的ffmpeg目录下，完成依赖。
+# 找到目录IJKMediaDemo->IJKMediaPlayer.xcodeproj->Classes->IJKFFMoviePlayerController->ffmpeg->lib，
+  鼠标右击delete -> Remove References删除依赖（千万别Move to Trash啊）
+# 把ios/build/universal下的四个文件夹拖到上面的ffmpeg目录下，重新完成依赖。
 # 至此：全部完成，已经可以直接真机调试demo
 ```
 
